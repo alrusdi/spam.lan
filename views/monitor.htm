@@ -1,0 +1,27 @@
+<h1>Live monitor</h1>
+{if $DATA}
+Mailer started: {$DATA.base.started|date_format:"%Y-%m-%d %H:%I:%S"} <br />
+Approx alive threads: {$DATA.base.threads_num}<br />
+Approx tasks left: {$DATA.base.tasks_num} <br />
+Current session productivity: {if $DATA.base.productivity}{$DATA.base.productivity} mails/hour{else}-{/if} <br />
+<table class="stats">
+<tr>
+	<th>Task</th>
+	<th>Started</th>
+	<th>Mails to send</th>
+	<th>Sent</th>
+	<th>Failed</th>
+</tr>
+{foreach from=$DATA.tasks item=val key=task_id}
+<tr>
+	<td>{$TASKS[$task_id]['name']} ({$task_id})</td>
+	<td>{$val.started|date_format:"%Y-%m-%d %H:%I:%S"}</td>
+	<td>{$val.mails}</td>
+	<td>{$val.sent}</td>
+	<td>{$val.fails}</td>
+</tr>
+{/foreach}
+</table>
+{else}
+No runing tasks detected.
+{/if}

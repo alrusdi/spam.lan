@@ -1,0 +1,92 @@
+{include file="header.htm"}
+{literal}
+<script type="text/javascript">
+function remove_srv() {
+	var tg=$(this).closest('div.smtp_srv_container');
+	var ct=$('div.smtp_srv_container').length;
+	var srv_id = tg.find('input.srv_id').val().replace(/[^0-9]/, '');
+	if ( srv_id!='' ) {
+		cur_srv_to_del = $('#srv_to_delete').val();
+		if (cur_srv_to_del) {
+			cur_srv_to_del+=','+srv_id
+		} else {
+			cur_srv_to_del = srv_id
+		}
+		$('#srv_to_delete').val(cur_srv_to_del);
+	}
+	if ( ct>1) {
+		tg.remove();
+		if (ct==2) {
+			$('div.smtp_srv_container:first').find('input.remove_srv').val('clear');
+		}
+	} else {
+		tg.find('input[type="text"],input[type="hidden"]').val('');
+	}
+}
+
+function add_srv() {
+	var tg=$(this).closest('div.smtp_srv_container');
+	var ct=$('div.smtp_srv_container').length;
+	$('div.smtp_srv_container:first').find('input.remove_srv').val('del');
+	var tpl=tg.html();
+	$('div.smtp_srv_container:last').after('<div class="smtp_srv_container">'+tpl+'</div>');
+	setTimeout(
+		function () {
+			$('div.smtp_srv_container:last').find('input[type=text],input[type=hidden]').val('');
+		},
+		10
+	);
+}
+
+$(document).ready(
+	function () {
+		$('input.remove_srv').live('click', remove_srv);
+		$('input.add_srv').live('click', add_srv);
+	}
+);
+</script>
+{/literal}
+<h1>Mailing settings</h1>
+<br />
+<form method="post">
+{if $STATE===true}
+<div class="ok" style="margin-bottom:10px;">{$MESSAGE}</div>
+{elseif $STATE===false}
+<div class="error" style="margin-bottom:10px;">{$MESSAGE}</div>
+{/if}
+<h2>1. Timeout between mail sends</h2>
+Enter a value in seconds: <input type="text" name="timeout" style="width:20px" value="{$data[0].timeout}" />
+<h2>2. Unsubscribe settings</h2>
+<div style="float:left;width:90px;">URL:</div> <input type="text" name="base_url" value="{if $data[0].base_url}{$data[0].base_url}{else}http://{$smarty.server.SERVER_NAME}/{/if}" /><br />
+<div style="float:left;width:90px;">Secret phrase:</div> <input type="text" name="secret_phrase" value="{$data[0].secret_phrase}" /> use only latin letters and digits
+<h2>3. SMTP servers</h2>
+<input type="hidden" name="servers_to_delete" id="srv_to_delete" />
+<input type="hidden" name="settings_email_id" value="{$data[0].settings_email_id}" />
+{foreach from=$data item=server name="srvs"}
+<div class="smtp_srv_container">
+<div style="float:left;width:70px;">server:</div> <input type="text" name="servers[server][]" value="{$server.server}" />
+<input type="button" class="remove_srv" value="{if count($data.smtp.servers)==1}clear{else}del{/if}" />
+<input type="button" class="add_srv" value="add" />
+<br />
+<div style="float:left;width:70px;">port:</div> <input type="text" name="servers[port][]" value="{$server.port}" /><br />
+<div style="float:left;width:70px;">user:</div> <input type="text" name="servers[user][]" value="{$server.user}" /><br />
+<div style="float:left;width:70px;">password:</div> <input type="text" name="servers[password][]" value="{$server.password}" /><br />
+<input type="hidden" class="srv_id" name="servers[id][]" value="{$server.id}" />
+</div>
+{foreachelse}
+<div class="smtp_srv_container">
+<div style="float:left;width:70px;">server:</div> <input type="text" name="servers[server][]" />
+<input type="button" class="remove_srv" value="clear" />
+<input type="button" class="add_srv" value="add" />
+<br />
+<div style="float:left;width:70px;">port:</div> <input type="text" name="servers[port][]" /><br />
+<div style="float:left;width:70px;">user:</div> <input type="text" name="servers[user][]" /><br />
+<div style="float:left;width:70px;">password:</div> <input type="text" name="servers[password][]" /><br />
+<input type="hidden" class="srv_id" name="servers[id][]" />
+</div>
+{/foreach}
+
+<br clear="all" /><br />
+<input type="submit" value="save" />
+</form>
+{include file="footer.htm"}

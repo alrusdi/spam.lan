@@ -1,0 +1,205 @@
+{include file="header.htm"}
+<script type="text/javascript" src="{$smarty.const.BASE_URL}js/date.js"></script>
+<script type="text/javascript" src="{$smarty.const.BASE_URL}js/jquery.datepicker.js"></script>
+{literal}
+<script type="text/javascript">
+	function do_filter(){
+		var get_params={};
+		var loc=window.location.href.toString();
+		var qpos=loc.indexOf('?');
+		if (qpos!=-1) {
+			loc=loc.substr(qpos+1);
+			var matches=loc.match(/(by_[a-z]+)=([0-9]+)/gi);
+			if (matches!=null && matches.length) {
+				var imatch=[];
+				for (i in matches) {
+					imatch=matches[i].split('=');
+					if (imatch.length==2) {
+						get_params[imatch[0]]=imatch[1];
+					}
+				}
+			}
+		}
+		var new_params='./?';
+		var params_changed=false;
+		$('#filters').find('select.filter, input.filter').each(
+			function () {
+				var ipar=$(this).val();
+				if (ipar) {
+					new_params+=this.id+'='+ipar+'&';
+				}
+				if (get_params[this.id]!=ipar) {
+					params_changed=true;
+				}
+			}
+		);
+		if (params_changed) {
+			var cpage;
+			var crpp;
+			var newloc=base_url+'members/'+new_params.replace(/\&$/gi, '');
+			/*
+			if (cpage=loc.match(/page=[0-9]+/)){
+				newloc+='&'+cpage.pop();
+			}
+			*/
+			if (crpp=loc.match(/rpp=[0-9]+/)) {
+				newloc+='&'+crpp.pop();
+			}
+			window.location=newloc;
+		}
+	}
+
+	function on_change_rpp(e) {
+		var tg=$(this);
+		var loc=window.location.href;
+		var rpp=tg.find('option:selected').val();
+		var request_has_params=(loc.indexOf('?')!=-1);
+		var new_loc=loc;
+		if (loc.indexOf('rpp=')==-1) {
+			new_loc+=(request_has_params) ? '&' : '?';
+			new_loc+='rpp='+rpp;
+		} else {
+			new_loc=loc.replace(/rpp=[0-9]+|rpp=All/gi, 'rpp='+rpp);
+		}
+		
+		
+		if (new_loc!=loc) {
+			window.location=new_loc;
+		}
+	}
+
+	function on_user_selection() {
+		if ($('input.isel:checked').length>0) {
+			$('#create_mail_task').removeAttr('disabled');
+		} else {
+			$('#create_mail_task').attr('disabled', 'disabled');
+		}
+	}
+	
+	function on_prepare_task_click() {
+		var selected_user_ids='';
+		$('input.isel:checked').each(
+			function () {
+				selected_user_ids+=$(this).attr('title')+',';
+			}
+		);
+		if (selected_user_ids) {
+			selected_user_ids='['+selected_user_ids.replace(/\,$/gi, '')+']';
+			$('#uids_for_mail').val(selected_user_ids);
+			$('#create_mail_task_form').submit();
+		}
+	} 
+	
+	$(document).ready(
+		function () {
+			$('#records_per_page').change(on_change_rpp);
+			//setup datepickers
+			Date.firstDayOfWeek = 0;
+			Date.format = 'yyyy-mm-dd';
+
+			$('.date-pick').datePicker({clickInput:true, startDate:'1996-01-01'});
+			
+			$('#selectall').click(function() { 
+				$('input.isel').attr('checked', $(this).is(':checked')); 
+				on_user_selection();
+			});
+			
+			$('input.isel').click(on_user_selection);
+			$('#create_mail_task').click(on_prepare_task_click);
+		}
+	);
+</script>
+{/literal}
+<h1>Members list</h1>
+<br />
+{if !($data.data)}
+No members found
+{else}
+<div id="filters">
+	<fieldset style="float:left; border:1px solid #DDD">
+		<legend>&nbsp;&nbsp;&nbsp;Filters&nbsp;&nbsp;&nbsp;</legend>
+		<table class="filters" >
+			<tr>
+				<th>id</th>
+				<th>name</th>
+				<th>email</th>
+				<th>status</th>
+				<th class="noborder">date</th>
+				<th rowspan="2" class="noborder"><input type="button" onclick="do_filter()"  value="go!" style="height:50px;width:50px;font-weight:bold;font-size:large;" /></th>
+			</tr>
+				<td>
+					<input style="width:40px" type="text" class="filter" id="by_id" value="{$smarty.get.by_id}"  />
+				</td>
+				<td>
+					<input style="width:120px" type="text" class="filter" id="by_username" value="{$smarty.get.by_username}"  />
+				</td>
+				<td>
+					<input style="width:120px" type="text" class="filter" id="by_email" value="{$smarty.get.by_email}"  />
+				</td>	
+				<td>
+					<select id="by_status"  class="filter">
+						<option value="">-select-</option>
+						{foreach from=$STATUSES key=key item=val}
+						<option value="{$key}" {if strval($smarty.get.by_status)===strval($key)}selected="selected"{/if}>{$val}</option>
+						{/foreach}
+					</select>	
+				</td>					
+				<td  class="noborder">
+					<input style="width:80px" type="text" class="filter date-pick" id="by_date_from" value="{$smarty.get.by_date_from|default:$DEFAULT_FROM_DATE}" /> &mdash; <input style="width:80px" type="text" class="filter date-pick" id="by_date_to" value="{$smarty.get.by_date_to|default:$DEFAULT_TO_DATE}"  />
+				</td>		
+			</tr>
+		</table>
+	</fieldset>
+
+	<div class="rpp" style="float:right">
+		Records on page:
+		<select id="records_per_page" style="margin-top:30px;">
+			{foreach from=$RPP_list item=val}
+			<option value="{$val}" {if ($current_RPP==$val)}selected="selected"{/if}>{$val}</option>
+			{/foreach}
+		</select>
+	</div>
+</div>
+<br clear="all">
+<form action="{$smarty.const.BASE_URL}tasks/edit/" method="post" id="create_mail_task_form">
+	<input type="hidden" name="uids_type" value="members" />
+	<input type="hidden" name="uids" id="uids_for_mail" />
+</form>
+<div style="margin-top:10px; height:30px">
+	Select some users to send them mail <input type="button" id="create_mail_task" value="prepare task" disabled="disabled" />
+</div>
+<table class="stats">
+<thead>
+<tr>
+<th><input type="checkbox" id="selectall" /></th>
+<th style="width:40px">id</th>
+<th>name</th>
+<th>status</th>
+<th>email</th>
+<th>joined</th>
+</tr>
+<thead>
+<tbody>
+{foreach from=$data.data item=val}
+<tr>
+<td style="text-align:center{if $val.wants_to_recieve_emails===false};background:#F1BDF5" title="This user doesn't want to recieve any emails{/if}"><input type="checkbox" class="isel" title="{$val.memberid}" /></td>
+<td>{$val.memberid}</td>
+<td>{$val.username}</td>
+<td>{$STATUSES[$val.status]}</td>
+<td>{$val.email}</td>
+<td>
+{if $val.joined}
+{if $NATS_VERSION==3}{$val.joined}{else}{$val.joined|date_format:'%Y-%m-%d %H:%M:%S'}{/if}
+{else}
+&mdash;
+{/if}
+</td>
+</tr>
+{/foreach}
+</tbody>
+</table>
+<br clear="all" />
+<br />
+{include file="paging.htm"}
+{/if}
+{include file="footer.htm"}

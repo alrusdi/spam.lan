@@ -1,0 +1,29 @@
+{include file="header.htm"}
+<h1>Edit/add system user</h1>
+<br />
+<form id="tedit_form" method="post">
+
+<div class="error" id="errors" style="{if !$errors}display:none; {/if}margin-bottom:10px;">{$errors}</div>
+<input type="hidden" name="id" value="{$data.id}" />
+<h2>1. User name</h2>
+<input type="text" name="name" value="{$data.name}" style="width:250px;" /> and block user <input type="checkbox" name="is_blocked" value="1" {if $data.is_blocked}checked="checked"{/if} />
+<h2>2. Passphrase {if $data.id}(skip if don't want to change){/if}</h2>
+<input type="text" name="passphrase" value="{$edited_passphrase}" style="width:250px;" />
+<h2>3. E-mail</h2>
+<input type="text" name="email" value="{$data.email}" style="width:250px;" />
+<br clear="all" />
+<h2>4. Role</h2>
+<select name="role">
+{foreach from=$ROLES item=val}
+<option value="{$val}" {if $val==$data.role}selected="selected"{/if}>{$val}</option>
+{/foreach}
+</select>
+
+<br clear="all" />
+<h2>5. Comment</h2>
+<textarea  style="width:250px;" name="comment">{$data.comment|htmlspecialchars}</textarea>
+<br clear="all" />
+<br clear="all" />
+<input type="submit" name="save" value="Save" />{if $data.id} or <input type="submit" name="remove" value="Remove" />{/if}
+</form>
+{include file="footer.htm"}

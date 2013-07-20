@@ -1,0 +1,41 @@
+{include file="header.htm"}
+<h1>Report info</h1>
+<br />
+
+<table>
+	<tr>
+		<td>Task:</td>
+		<td><a href="{$smarty.const.BASE_URL}tasks/edit/{$TASK.id}">{$TASK.name}</a></td>
+	</tr>
+	<tr>
+		<td>Complete mails:</td>
+		<td>{$REPORT.sends_complete}</td>
+	</tr>
+	<tr>
+		<td>Failed mails:</td>
+		<td>{$REPORT.sends_failed}</td>
+	</tr>
+	<tr>
+		<td>Started:</td>
+		<td>{$REPORT.started}</td>
+	</tr>
+	<tr>
+		<td>Finished:</td>
+		<td>{$REPORT.finished}</td>
+	</tr>
+</table>
+{if !empty($REPORT.log)}
+<br />
+<h2>Detailed log:</h2>
+<table class="log_table">
+	<tr>
+		<th>Recipient</th><th>Server</th><th>Error</th>
+	</tr>
+	{foreach from=$REPORT.log item=val}
+	<tr>
+		<td>{$val.to}</td><td>{$val.smtp.server}:{$val.smtp.port}</td><td>{$val.error|htmlspecialchars}</td>
+	</tr>	
+	{/foreach}
+</table>
+{/if}
+{include file="footer.htm"}

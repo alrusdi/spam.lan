@@ -1,0 +1,122 @@
+{include file="header.htm"}
+<script type="text/javascript">
+	function add_db() {
+		var tgt = $('#settings_container').find('div.settings_block:last');
+		var tpl = tgt.html().replace(/value="[^"]+"|checked="checked"|selected="selected"|style="display\:none"/gim, '');
+		tgt.after('<div class="settings_block">'+tpl+'</div>');
+		tgt.find('input.rm_db').show()
+		setTimeout(
+			function () {
+				//its new one!
+				//$('#settings_container').find('div.settings_block:last').find('input.rm_db').val('remove');
+				$('#settings_container').find('input.rm_db').removeAttr('disabled').val('remove');
+			},
+			50
+		);
+	}
+	
+	function rm_db(e) {
+		var ct=$('#settings_container').find('div.settings_block').length
+		if (ct==2) {
+			$('#settings_container').find('input.rm_db').attr('disabled', 'disabled')
+		}
+		var to_del = $(this).closest('div.settings_block');
+		var set_id = to_del.find('input.db_id').val();
+		if ( set_id!='' ) {
+			db_settings_to_delete.push(set_id);
+		}
+		to_del.remove();
+	}
+	
+	
+	var db_settings_to_delete=[];
+	function save_db() {
+		$('#save_db').attr('disabled', 'disabled');
+		var i=0;
+		var form_html='';
+		$('#settings_container').find('div.settings_block').each(
+			function () {
+				i++;
+				$(this).find('input[type=text],input[type=radio],input[type=hidden],option:selected').each(
+					function () {
+						var me = $(this)
+						name = me.attr('name')
+						if ( me.is('option') ) {
+							name = me.parent().attr('name');
+						}
+						var val = me.val();
+						if ( me.is(':radio') ) {
+							val = me.attr('checked') ? '1': '0';
+						}
+						form_html+='<input type="hidden" name="data['+i+']['+name+']" value="'+val.replace('"', "'")+'" />';
+						if (db_settings_to_delete.length>0) {
+							form_html+='<input type="hidden" name="data[settings_to_delete]" value="'+db_settings_to_delete.join(',')+'" />'
+						}
+					}
+				)
+			}
+		);
+		$('#db_form').html(form_html);
+		setTimeout(
+			function () {
+				$('#db_form').submit();
+			},
+			50
+		);
+	}
+	
+	$(document).ready(
+		function (){
+			$('#add_db').click(add_db);
+			$('input.rm_db').live('click', rm_db);
+			$('#save_db').click(save_db);
+		}
+	);
+</script>
+<h1>NATS database settings</h1>
+<br />
+<form method="post" id="db_form">
+
+</form>
+{if $STATE===true}
+<div class="ok" style="margin-bottom:10px;">{$MESSAGE}</div>
+{elseif $STATE===false}
+<div class="error" style="margin-bottom:10px;">{$MESSAGE}</div>
+{/if}
+<div id="settings_container">
+
+{foreach from=$data item=val}
+<div class="settings_block">
+<div style="float:left;width:70px;">server:</div> <input type="text" name="server" value="{$val.server}" /><br />
+<div style="float:left;width:70px;">port:</div> <input type="text" name="port" value="{$val.port}" /><br />
+<div style="float:left;width:70px;">db_name:</div> <input type="text" name="name" value="{$val.name}" /><br />
+<div style="float:left;width:70px;">user:</div> <input type="text" name="user" value="{$val.user}" /><br />
+<div style="float:left;width:70px;">password:</div> <input type="text" name="password" value="{$val.password}" /><br />
+<div style="float:left;width:70px;">version:</div> <select name="version">
+			<option value="">-</option>
+			<option value="3" {if $val.version==3}selected="selected"{/if}>3</option>
+			<option value="4" {if $val.version==4}selected="selected"{/if}>4</option>
+		</select><input type="button" class="rm_db" value="remove" /> Set active:<input type="radio" name="is_active" {if $val.is_active}checked="checked"{/if} />
+<input type="hidden" class="db_id" name="id" value="{$val.id}" />
+<br clear="all" /><br />
+</div>
+{foreachelse}
+<div class="settings_block">
+<div style="float:left;width:70px;">server:</div> <input type="text" name="server" /><br />
+<div style="float:left;width:70px;">port:</div> <input type="text" name="port"/><br />
+<div style="float:left;width:70px;">db_name:</div> <input type="text" name="name" /><br />
+<div style="float:left;width:70px;">user:</div> <input type="text" name="user" /><br />
+<div style="float:left;width:70px;">password:</div> <input type="text" name="password" /><br />
+<div style="float:left;width:70px;">version:</div> <select name="version">
+			<option value="">-</option>
+			<option value="3" {if $val.version==3}selected="selected"{/if}>3</option>
+			<option value="4" {if $val.version==4}selected="selected"{/if}>4</option>
+		</select><input type="button"  class="rm_db" value="remove" disabled="disabled" /> Set active:<input type="radio" name="is_active" {if $val.is_active}checked="checked"{/if} />
+<input type="hidden" class="db_id" name="id" />
+<br clear="all" /><br />
+</div>
+{/foreach}
+
+</div>
+<input type="button" value="save" id="save_db" /><input type="button" value="add" id="add_db" />
+{include file="footer.htm"}

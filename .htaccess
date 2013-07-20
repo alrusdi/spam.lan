@@ -1,0 +1,14 @@
+ErrorDocument 404 /index.php
+#AddDefaultCharset utf-8
+
+Options +FollowSymLinks
+RewriteEngine On
+
+RewriteCond %{REQUEST_FILENAME} !/img/*
+RewriteCond %{REQUEST_FILENAME} !/images/*
+RewriteCond %{REQUEST_FILENAME} !/css/*
+RewriteCond %{REQUEST_FILENAME} !/js/*
+RewriteCond %{REQUEST_FILENAME} !/files/*
+RewriteCond %{REQUEST_FILENAME} !/tinymce/*
+RewriteCond $1 !^(index\.php|test\.php|images|robots\.txt|favicon.ico)
+RewriteRule ^(.*)$ /index.php/$1 [L]

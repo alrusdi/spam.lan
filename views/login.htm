@@ -1,0 +1,8 @@
+{include file="header.htm" hide_logout=true}
+{if !empty($msg)}
+<span class="error">{$msg}</span>
+{/if}
+<form method="post" id="login_form">
+Enter your passphrase: <input type="password" name="passphrase" id="pass" /><input type="submit" value="send" />
+</form>
+{include file="footer.htm"}

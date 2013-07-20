@@ -1,0 +1,211 @@
+{include file="header.htm"}
+{literal}
+<script type="text/javascript">
+
+function refresh_monitor() {
+		$.get(
+			base_url+'/index/ajax_monitor/',
+			function (data) {
+				$('#live_monitor').html(data);
+			}
+		);
+}
+
+$(document).ready(
+	function () {
+		setInterval(refresh_monitor, 3000);
+	}
+);
+</script>
+{/literal}
+<h1>Yesterday tasks</h1>
+{if $YESTERDAY}
+<table class="stats">
+<thead>
+<tr>
+<th style="width:40px">id</th>
+<th>name</th>
+<th>type</th>
+<th>status</th>
+<th>template</th>
+<th>sheduled</th>
+<th>started</th>
+<th>finished</th>
+<th>creator</th>
+<th>created date</th>
+<th style="width:100px">action</th>
+</tr>
+<thead>
+<tbody>
+{foreach from=$YESTERDAY item=val}
+<tr>
+<td style="text-align:center">{$val.id}</td>
+<td>{$val.name|htmlspecialchars|mb_substr:0:20}</td>
+<td>{$val.type}</td>
+<td>{if $val.is_disabled}DISABLED{else}{$val.status}{/if}</td>
+<td><a href="{$smarty.const.BASE_URL}templates/edit/{$val.template_id}">{$TEMPLATES[$val['template_id']]['name']}</a></a></td>
+<td>{$val.when_to_start|format_date}</td>
+<td>{$val.start_run_time|default:'&mdash;'}</td>
+<td>{$val.end_run_time|default:'&mdash;'}</td>
+<td><a href="{$smarty.const.BASE_URL}users/edit/{$val.creator_id}">{$USERS[$val['creator_id']]['name']}</a></a></td>
+<td>{$val.creation_time}</td>
+<td style="text-align:center"><a href="{$smarty.const.BASE_URL}tasks/edit/{$val.id}">[edit]</a>&nbsp;<a href="{$smarty.const.BASE_URL}reports/view/{$val.report_id}">[view report]</a></td>
+</tr>
+{/foreach}
+</tbody>
+</table>
+{else}
+No tasks found
+{/if}
+<h1>Today tasks</h1>
+{if $TODAY}
+{if $TODAY.COMPLETE}
+<table class="stats">
+<thead>
+<tr>
+<th style="width:40px">id</th>
+<th>name</th>
+<th>type</th>
+<th>status</th>
+<th>template</th>
+<th>sheduled</th>
+<th>started</th>
+<th>finished</th>
+<th>creator</th>
+<th>created date</th>
+<th style="width:100px">action</th>
+</tr>
+<thead>
+<tbody>
+{foreach from=$TODAY.COMPLETE item=val}
+<tr>
+<td style="text-align:center">{$val.id}</td>
+<td>{$val.name|htmlspecialchars|mb_substr:0:20}</td>
+<td>{$val.type}</td>
+<td>{if $val.is_disabled}DISABLED{else}{$val.status}{/if}</td>
+<td><a href="{$smarty.const.BASE_URL}templates/edit/{$val.template_id}">{$TEMPLATES[$val['template_id']]['name']}</a></a></td>
+<td>{$val.when_to_start|format_date}</td>
+<td>{$val.start_run_time|default:'&mdash;'}</td>
+<td>{$val.end_run_time|default:'&mdash;'}</td>
+<td><a href="{$smarty.const.BASE_URL}users/edit/{$val.creator_id}">{$USERS[$val['creator_id']]['name']}</a></a></td>
+<td>{$val.creation_time}</td>
+<td style="text-align:center"><a href="{$smarty.const.BASE_URL}tasks/edit/{$val.id}">[edit]</a>&nbsp;<a href="{$smarty.const.BASE_URL}reports/view/{$val.report_id}">[view report]</a></td>
+</tr>
+{/foreach}
+</tbody>
+</table>
+{/if}
+
+{if $TODAY.NEW}
+<br /><br />
+<table class="stats">
+<thead>
+<tr>
+<th style="width:40px">id</th>
+<th>name</th>
+<th>type</th>
+<th>status</th>
+<th>template</th>
+<th>sheduled</th>
+<th>started</th>
+<th>finished</th>
+<th>creator</th>
+<th>created date</th>
+<th style="width:80px">action</th>
+</tr>
+<thead>
+<tbody>
+{foreach from=$TODAY.NEW item=val}
+<tr>
+<td style="text-align:center">{$val.id}</td>
+<td>{$val.name|htmlspecialchars|mb_substr:0:20}</td>
+<td>{$val.type}</td>
+<td>{if $val.is_disabled}DISABLED{else}{$val.status}{/if}</td>
+<td><a href="{$smarty.const.BASE_URL}templates/edit/{$val.template_id}">{$TEMPLATES[$val['template_id']]['name']}</a></a></td>
+<td>{$val.when_to_start|format_date}</td>
+<td>{$val.start_run_time|default:'&mdash;'}</td>
+<td>{$val.end_run_time|default:'&mdash;'}</td>
+<td><a href="{$smarty.const.BASE_URL}users/edit/{$val.creator_id}">{$USERS[$val['creator_id']]['name']}</a></a></td>
+<td>{$val.creation_time}</td>
+<td style="text-align:center"><a href="{$smarty.const.BASE_URL}tasks/edit/{$val.id}">[edit]</a></td>
+</tr>
+{/foreach}
+</tbody>
+</table>
+{/if}
+
+{else}
+No tasks found
+{/if}
+{if $TOMORROW}
+<h1>Tomorrow tasks</h1>
+<table class="stats">
+<thead>
+<tr>
+<th style="width:40px">id</th>
+<th>name</th>
+<th>type</th>
+<th>status</th>
+<th>template</th>
+<th>sheduled</th>
+<th>started</th>
+<th>finished</th>
+<th>creator</th>
+<th>created date</th>
+<th style="width:80px">action</th>
+</tr>
+<thead>
+<tbody>
+{foreach from=$TOMORROW item=val}
+<tr>
+<td style="text-align:center">{$val.id}</td>
+<td>{$val.name|htmlspecialchars|mb_substr:0:20}</td>
+<td>{$val.type}</td>
+<td>{if $val.is_disabled}DISABLED{else}{$val.status}{/if}</td>
+<td><a href="{$smarty.const.BASE_URL}templates/edit/{$val.template_id}">{$TEMPLATES[$val['template_id']]['name']}</a></a></td>
+<td>{$val.when_to_start|format_date}</td>
+<td>{$val.start_run_time|default:'&mdash;'}</td>
+<td>{$val.end_run_time|default:'&mdash;'}</td>
+<td><a href="{$smarty.const.BASE_URL}users/edit/{$val.creator_id}">{$USERS[$val['creator_id']]['name']}</a></a></td>
+<td>{$val.creation_time}</td>
+<td style="text-align:center"><a href="{$smarty.const.BASE_URL}tasks/edit/{$val.id}">[edit]</a></td>
+</tr>
+{/foreach}
+</tbody>
+</table>
+{/if}
+<br clear="all" />
+<hr />
+<h1>Subscriptions stats</h1>
+<table class="stats">
+	<tr>
+		<th>members</th>
+		<th>webmasters</th>
+	</tr>
+	<tr>
+		<td>
+		{if $UNS_STATS.members}
+		{foreach from=$UNS_STATS.members item=val}
+			{$val.fieldname}:{$val[$val['fieldname']]} => {$val.ct} <br />
+		{/foreach}
+		{else}
+		&mdash;
+		{/if}
+		</td>
+		<td>
+		{if $UNS_STATS.webmasters}
+		{foreach from=$UNS_STATS.webmasters item=val}
+			{$val.fieldname}:{$val[$val['fieldname']]} => {$val.ct} <br />
+		{/foreach}
+		{else}
+		&mdash;
+		{/if}
+		</td>
+	</tr>
+</table>
+<br clear="all" />
+<hr />
+<div id="live_monitor">
+Live monitor is loading...
+</div>
+{include file="footer.htm"}

@@ -1,0 +1,29 @@
+{if $PAGING.pages}
+        <div class="paging">
+            <div class="pg_pages">
+		{if $PAGING.prev}
+		<span class="pg_prev"><a class="pg_page" href='./?page={$PAGING.prev}{$URL}'><<</a> </span>
+		{/if}
+		{if $PAGING.left_dots}
+		<span class="pg_ldots"><a class="pg_page" href='./?page={$PAGING.left_dots}{$URL}'>...</a> </span>
+		{/if}
+		<span class="pg_pages">		
+                {foreach from=$PAGING.pages item=obj}
+                {if $obj==$current_page}
+			<span class="pg_page">{$obj}</span>
+                {else}
+			<a class="pg_page" href="./?page={$obj}{$URL}">{$obj}</a>
+                {/if}
+                {/foreach}
+		</span>
+
+		{if $PAGING.right_dots}
+		<span class="pg_next"><a class="pg_page"href='./?page={$PAGING.right_dots}{$URL}'>...</a> </span>
+		{/if}	
+		{if $PAGING.next}
+		<span class="pg_next"><a class="pg_page" href='./?page={$PAGING.next}{$URL}'>>></a> </span>
+		{/if}
+            </div>
+        </div>
+		<br />
+{/if}

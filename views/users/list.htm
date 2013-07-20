@@ -1,0 +1,38 @@
+{include file="header.htm"}
+<h1>Users list</h1>
+<br />
+{if !($data)}
+No users found. <a href="{$smarty.const.BASE_URL}users/edit/">Add new one</a>
+{else}
+<input type="button" onclick="window.location='{$smarty.const.BASE_URL}users/edit/'" value="Add new user" />
+<br /><br />
+<table class="stats">
+<thead>
+<tr>
+<th style="width:40px">id</th>
+<th>name</th>
+<th>email</th>
+<th>role</th>
+<th>blocked</th>
+<th>comment</th>
+<th>registered</th>
+<th style="width:80px">action</th>
+</tr>
+<thead>
+<tbody>
+{foreach from=$data item=val}
+<tr>
+<td style="text-align:center">{$val.id}</td>
+<td>{$val.name|htmlspecialchars|mb_substr:0:20}</td>
+<td>{$val.email}</td>
+<td>{$val.role}</td>
+<td>{if $val.is_blocked}YES{else}&nbsp;{/if}</td>
+<td>{$val.comment|htmlspecialchars}</td>
+<td>{$val.added_time}</td>
+<td style="text-align:center"><a href="{$smarty.const.BASE_URL}users/edit/{$val.id}">[edit]</a>&nbsp;<a href="{$smarty.const.BASE_URL}users/del/{$val.id}">[del]</a></td>
+</tr>
+{/foreach}
+</tbody>
+</table>
+{/if}
+{include file="footer.htm"}

@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf8" />
+<link href="{$smarty.const.BASE_URL}css/style.css" rel="stylesheet" type="text/css" />
+<link href="{$smarty.const.BASE_URL}css/datePicker.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="{$smarty.const.BASE_URL}js/jquery.min.js"></script>
+<script type="text/javascript" src="{$smarty.const.BASE_URL}js/jquery.cookie.js"></script>
+<title></title>
+<script type="text/javascript">
+var base_url='{$smarty.const.BASE_URL}';
+</script>
+</head>
+<body>
+<div class="center">
+<br />
+{if empty($hide_menu)}
+<div class="nav">
+		<a href="{$smarty.const.BASE_URL}">Home</a>
+		&nbsp;| <a href="{$smarty.const.BASE_URL}templates/">Templates</a>
+		&nbsp;| <a href="{$smarty.const.BASE_URL}webmasters/">Webmasters</a>
+		&nbsp;| <a href="{$smarty.const.BASE_URL}members/">Members</a>
+		&nbsp;| <a href="{$smarty.const.BASE_URL}tasks/">Tasks</a>
+		&nbsp;| <a href="{$smarty.const.BASE_URL}reports/">Reports</a>
+		&nbsp;| <a href="{$smarty.const.BASE_URL}settings/">Settings</a>
+		{if empty($hide_logout)}
+		&nbsp;| <a href="{$smarty.const.BASE_URL}logout/">Logout</a>
+		{/if}
+</div>
+<br />
+{/if}
+{if !empty($PATHWAY)}
+<div class="pathway">
+	{foreach from=$PATHWAY item=val name=pway}
+		{if $smarty.foreach.pway.last}
+		&rarr; <span>{$val.name} &darr;</span>
+		{else}
+		{if !$smarty.foreach.pway.first} &rarr; {/if}
+		<a href="{$smarty.const.BASE_URL}{$val.path}">{$val.name}</a> 
+		{/if}
+	{/foreach}
+</div>
+<br />
+{/if}
+

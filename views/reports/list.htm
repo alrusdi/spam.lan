@@ -1,0 +1,101 @@
+{include file="header.htm"}
+{literal}
+<script type="text/javascript">
+	function on_delete_click(e) {
+		e.preventDefault();
+		var tg=$(this);
+		var tpl_id=tg.attr('id').toString().replace(/[^0-9]/gi, '');
+		$.post(
+			base_url+'templates/delete/'+tpl_id,
+			function (data) {
+				if (data.status=='ok') {
+					var loc=window.location.href.toString();
+					var cur_page=loc.match(/page=([0-9]+)/gi).pop().match(/[0-9]+/).pop();
+					if (cur_page && cur_page>1 && $('a.tpl_del').length==1) {
+						new_page=(cur_page)*1-1;
+						window.location=loc.replace(/page=[0-9]+/, 'page='+new_page);
+					} else {
+						window.location.reload();
+					}					
+				}
+			},
+			'json'
+		);
+		
+	}
+	
+	function on_change_rpp(e) {
+		var tg=$(this);
+		var loc=window.location.href;
+		var rpp=tg.find('option:selected').val();
+		var request_has_params=(loc.indexOf('?')!=-1);
+		var new_loc=loc;
+		if (loc.indexOf('rpp=')==-1) {
+			new_loc+=(request_has_params) ? '&' : '?';
+			new_loc+='rpp='+rpp;
+		} else {
+			new_loc=loc.replace(/rpp=[0-9]+|rpp=All/gi, 'rpp='+rpp);
+		}
+		
+		
+		if (new_loc!=loc) {
+			window.location=new_loc;
+		}
+	}
+
+	
+	
+	$(document).ready(
+		function () {
+			$('a[id^=tpl_]').click(on_delete_click);
+			$('#records_per_page').change(on_change_rpp);
+		}
+	);
+</script>
+{/literal}
+<h1>Reports list</h1>
+<br />
+{if !($data.data)}
+No reports found.
+{else}
+Records on page:<select id="records_per_page">
+{* RPP - number of Records Per Page *}
+{foreach from=$RPP_list item=val}
+<option value="{$val}" {if ($current_RPP==$val)}selected="selected"{/if}>{$val}</option>
+{/foreach}
+</select> | 
+<input type="button" onclick="window.location='{$smarty.const.BASE_URL}tasks/edit/'" value="Add new task" />
+<br /><br />
+<table class="stats">
+<thead>
+<tr>
+<th style="width:40px">id</th>
+<th>task</th>
+<th>total</th>
+<th>sent</th>
+<th>failed</th>
+<th>started</th>
+<th>finished</th>
+<th style="width:80px">action</th>
+</tr>
+<thead>
+<tbody>
+{foreach from=$data.data item=val}
+<tr>
+<td style="text-align:center">{$val.id}</td>
+<td><a href="{$smarty.const.BASE_URL}tasks/edit/{$val.task_id}">{$val.task_name}</a></td>
+<td>{$val.sends_complete + $val.sends_failed}</td>
+<td>{$val.sends_complete}</td>
+<td>{$val.sends_failed}</td>
+<td>{$val.started}</td>
+<td>{$val.finished}</td>
+<td style="text-align:center">{if $val.log}<a href="{$smarty.const.BASE_URL}reports/view/{$val.id}">[view log]</a>{else}&mdash;{/if}</td>
+</tr>
+{/foreach}
+</tbody>
+</table>
+<br clear="all" />
+<br />
+{include file="paging.htm"}
+{/if}
+{include file="footer.htm"}
